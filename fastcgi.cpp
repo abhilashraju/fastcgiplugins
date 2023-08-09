@@ -1,5 +1,6 @@
 #include <alloca.h>
 #include <fcgiapp.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
@@ -7,6 +8,8 @@
 #define LISTENSOCK_FLAGS 0
 int main(int argc, char **argv) {
   openlog("testfastcgi", LOG_CONS | LOG_NDELAY, LOG_USER);
+  // int socket_fd = FCGX_OpenSocket("/tmp/hello.sock", 8081);
+
   int err = FCGX_Init(); /* call before Accept in multithreaded apps */
   if (err) {
     syslog(LOG_INFO, "FCGX_Init failed: %d", err);
@@ -23,7 +26,9 @@ int main(int argc, char **argv) {
     err = FCGX_Accept_r(&cgi);
     if (err) {
       syslog(LOG_INFO, "FCGX_Accept_r stopped: %d", err);
-      break;
+      auto m = strerror(err);
+      std::cout << m;
+      return 0;
     }
     char **envp;
     int size = 200;
